@@ -1,8 +1,8 @@
-# ApproveIt Games - Plataforma de Jogos Educativos
+ApproveIt Games - Plataforma de Jogos Educativos
 
 Uma plataforma completa para criação e compartilhamento de jogos educativos baseados em termos e definições. O sistema permite que usuários cadastrem conteúdo educativo e automaticamente gerem três tipos de jogos interativos: Jogo da Memória, Jogo de Associação e Quiz.
 
-## 📋 Descrição do Projeto
+ 📋 Descrição do Projeto
 
 O ApproveIt Games é uma aplicação web desenvolvida para facilitar o aprendizado através de jogos educativos. A plataforma oferece uma interface intuitiva onde educadores e estudantes podem:
 
@@ -11,15 +11,15 @@ O ApproveIt Games é uma aplicação web desenvolvida para facilitar o aprendiza
 - **Compartilhar Experiências**: Disponibilizar jogos para outros usuários através de códigos únicos
 - **Acompanhar Progresso**: Registrar e visualizar resultados das partidas
 
-### Tipos de Jogos Disponíveis
+ Tipos de Jogos Disponíveis
 
 1. **🧠 Jogo da Memória**: Encontre os pares correspondentes entre termos e definições
 2. **🔗 Jogo de Associação**: Arraste termos para suas definições correspondentes
 3. **❓ Quiz**: Responda perguntas de múltipla escolha sobre os termos cadastrados
 
-## 🚀 Tecnologias Utilizadas
+ 🚀 Tecnologias Utilizadas
 
-### Backend
+ Backend
 - **Node.js** - Ambiente de execução JavaScript
 - **Express.js** - Framework web para Node.js
 - **MongoDB** - Banco de dados NoSQL
@@ -29,14 +29,14 @@ O ApproveIt Games é uma aplicação web desenvolvida para facilitar o aprendiza
 - **cors** - Habilitação de CORS
 - **dotenv** - Gerenciamento de variáveis de ambiente
 
-### Frontend
+ Frontend
 - **HTML5** - Estrutura das páginas
 - **CSS3** - Estilização e responsividade
 - **JavaScript (ES6+)** - Interatividade e lógica do cliente
 - **Drag and Drop API** - Funcionalidade de arrastar e soltar
 - **Local Storage** - Armazenamento local de dados do jogo
 
-### Funcionalidades Implementadas
+ Funcionalidades Implementadas
 - Sistema completo de autenticação (login, registro, logout)
 - CRUD completo para gerenciamento de usuários
 - CRUD completo para termos e definições
@@ -47,7 +47,7 @@ O ApproveIt Games é uma aplicação web desenvolvida para facilitar o aprendiza
 - Sistema de pontuação dinâmica
 - Suporte a categorização de conteúdo
 
-## 📦 Instalação e Configuração
+ 📦 Instalação e Configuração
 
 ### Pré-requisitos
 
