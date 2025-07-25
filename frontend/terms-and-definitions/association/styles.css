@@ -1,0 +1,301 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Contêiner principal */
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1.title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Seção do jogo */
+.game-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+    background: rgba(255,255,255,0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.term-container,
+.definition-container {
+    background: rgba(255,255,255,0.9);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.term-container h2,
+.definition-container h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+/* Contêineres de itens */
+.draggable-container,
+.droppable-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 300px;
+}
+
+/* Itens arrastáveis (termos) */
+.draggable-item {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.draggable-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.draggable-item:active,
+.draggable-item.dragging {
+    cursor: grabbing;
+    transform: rotate(5deg) scale(1.05);
+    opacity: 0.8;
+}
+
+.draggable-item.matched {
+    opacity: 0.5;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+/* Itens de destino (definições) */
+.droppable-item {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 1rem;
+    min-height: 80px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.droppable-item.drag-over {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.02);
+}
+
+.droppable-item.matched {
+    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    border-color: #00b894;
+    color: white;
+}
+
+.droppable-item.error {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.definition-content {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.droppable-item.matched .definition-content {
+    color: white;
+}
+
+.drop-zone {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.05);
+}
+
+.droppable-item.matched .drop-zone {
+    display: none;
+}
+
+.matched-term {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Cronômetro */
+.timer {
+    font-size: 2rem;
+    color: white;
+    background: rgba(255,255,255,0.2);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin: 1rem auto;
+    max-width: 200px;
+    backdrop-filter: blur(10px);
+}
+
+/* Feedback */
+.feedback {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.feedback.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.feedback.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Botões */
+.menu-btn,
+.restart-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin: 0.5rem;
+}
+
+.menu-btn:hover,
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .game-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .term-container,
+    .definition-container {
+        padding: 1rem;
+    }
+
+    .draggable-item,
+    .droppable-item {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    h1.title {
+        font-size: 2rem;
+    }
+
+    .timer {
+        font-size: 1.5rem;
+        padding: 0.75rem;
+    }
+
+    .game-stats {
+        gap: 1rem;
+    }
+
+    .stat-item {
+        min-width: 100px;
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-section {
+        padding: 0.5rem;
+    }
+
+    .term-container,
+    .definition-container {
+        padding: 0.75rem;
+    }
+
+    .draggable-item,
+    .droppable-item {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .definition-content {
+        font-size: 0.8rem;
+    }
+
+    .drop-zone {
+        font-size: 0.7rem;
+        padding: 0.25rem;
+    }
+}
+
+/* Animações para touch */
+@media (hover: none) {
+    .draggable-item:hover {
+        transform: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .draggable-item:active {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+

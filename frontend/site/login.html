@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ApproveIt Games</title>
+    <link rel="stylesheet" href="auth-styles.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <span class="brand-logo">🎮</span>
+            <h1>Bem-vindo de volta!</h1>
+            <p>Entre na sua conta para continuar</p>
+        </div>
+        
+        <div class="auth-body">
+            <div id="message-container"></div>
+            
+            <form action="/login" method="POST" id="login-form">
+                <div class="form-group">
+                    <label for="email">E-mail ou Nome de Usuário</label>
+                    <input type="text" id="email" name="usernameOrEmail" required 
+                           placeholder="Digite seu e-mail ou nome de usuário">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Digite sua senha">
+                </div>
+                
+                <button type="submit" class="btn-primary" id="login-btn">
+                    <span class="btn-text">Entrar</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+            
+            <div class="auth-links">
+                <a href="resgistrar.html">Criar nova conta</a>
+                <a href="reset-password.html">Alterar Senha</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('login-form');
+            const loginBtn = document.getElementById('login-btn');
+            const loading = loginBtn.querySelector('.loading');
+            const messageContainer = document.getElementById('message-container');
+            
+            // Verificar mensagens de erro na URL
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('error')) {
+                const errorType = params.get('error');
+                let errorMessage = '';
+                
+                switch(errorType) {
+                    case 'invalid_credentials':
+                        errorMessage = 'Usuário ou senha inválidos.';
+                        break;
+                    case 'user_not_found':
+                        errorMessage = 'Usuário não encontrado.';
+                        break;
+                    case 'incorrect_password':
+                        errorMessage = 'Senha incorreta.';
+                        break;
+                    default:
+                        errorMessage = 'Erro ao fazer login. Tente novamente.';
+                }
+                
+                showMessage(errorMessage, 'error');
+            }
+            
+            // Verificar sessão
+            fetch('/session')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showMessage(data.error, 'error');
+                    }
+                    if (data.authenticated) {
+                        window.location.href = '/indexcomeco.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar sessão:', error);
+                });
+            
+            // Manipular envio do formulário
+            form.addEventListener('submit', function(e) {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    e.preventDefault();
+                    showMessage('Por favor, preencha todos os campos.', 'error');
+                    return;
+                }
+                
+                // Mostrar loading
+                loginBtn.classList.add('loading');
+                loading.classList.add('show');
+            });
+            
+            // Função para mostrar mensagens
+            function showMessage(message, type) {
+                messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+                
+                // Remover mensagem após 5 segundos
+                setTimeout(() => {
+                    const messageEl = messageContainer.querySelector('.message');
+                    if (messageEl) {
+                        messageEl.style.animation = 'fadeOut 0.3s ease-out';
+                        setTimeout(() => {
+                            messageContainer.innerHTML = '';
+                        }, 300);
+                    }
+                }, 5000);
+            }
+            
+            // Adicionar animação de fadeOut
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeOut {
+                    from { opacity: 1; transform: translateY(0); }
+                    to { opacity: 0; transform: translateY(-10px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Melhorar UX dos inputs
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

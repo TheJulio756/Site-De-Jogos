@@ -1,0 +1,132 @@
+
+Gerenciador de Inicializa‡ao do Windows
+--------------------
+identificador           {bootmgr}
+device                  partition=M:
+description             Windows Boot Manager
+locale                  pt-BR
+inherit                 {globalsettings}
+default                 {default}
+resumeobject            {443f2dc0-fe92-11d5-bafb-93163ce10289}
+displayorder            {default}
+bootsequence            {443f2dc2-fe92-11d5-bafb-93163ce10289}
+toolsdisplayorder       {memdiag}
+timeout                 30
+
+Carregador de Inicializa‡ao do Windows
+-------------------
+identificador           {1bc38f57-91ba-11e7-b898-94ca274a1017}
+device                  ramdisk=[M:]\Recovery\WindowsRE\Winre.wim,{1bc38f58-91ba-11e7-b898-94ca274a1017}
+path                    \windows\system32\winload.exe
+description             Windows Recovery Environment
+locale                  pt-BR
+inherit                 {bootloadersettings}
+custom:15000065         3
+osdevice                ramdisk=[M:]\Recovery\WindowsRE\Winre.wim,{1bc38f58-91ba-11e7-b898-94ca274a1017}
+systemroot              \windows
+nx                      OptIn
+custom:250000c2         1
+winpe                   Yes
+
+Carregador de Inicializa‡ao do Windows
+-------------------
+identificador           {default}
+device                  partition=C:
+path                    \Windows\system32\winload.exe
+description             Windows 7
+locale                  pt-BR
+inherit                 {bootloadersettings}
+recoverysequence        {443f2dc2-fe92-11d5-bafb-93163ce10289}
+recoveryenabled         Yes
+osdevice                partition=C:
+systemroot              \Windows
+resumeobject            {443f2dc0-fe92-11d5-bafb-93163ce10289}
+nx                      OptIn
+
+Carregador de Inicializa‡ao do Windows
+-------------------
+identificador           {443f2dc2-fe92-11d5-bafb-93163ce10289}
+device                  ramdisk=[C:]\Recovery\443f2dc2-fe92-11d5-bafb-93163ce10289\Winre.wim,{443f2dc3-fe92-11d5-bafb-93163ce10289}
+path                    \windows\system32\winload.exe
+description             Windows Recovery Environment
+inherit                 {bootloadersettings}
+osdevice                ramdisk=[C:]\Recovery\443f2dc2-fe92-11d5-bafb-93163ce10289\Winre.wim,{443f2dc3-fe92-11d5-bafb-93163ce10289}
+systemroot              \windows
+nx                      OptIn
+winpe                   Yes
+
+Continuar da Hiberna‡ao
+---------------------
+identificador           {443f2dc0-fe92-11d5-bafb-93163ce10289}
+device                  partition=C:
+path                    \Windows\system32\winresume.exe
+description             Windows Resume Application
+locale                  pt-BR
+inherit                 {resumeloadersettings}
+filedevice              partition=C:
+filepath                \hiberfil.sys
+debugoptionenabled      No
+
+Testador de Mem¢ria do Windows
+---------------------
+identificador           {memdiag}
+device                  partition=M:
+path                    \boot\memtest.exe
+description             Diagn¢stico de Mem¢ria do Windows
+locale                  pt-BR
+inherit                 {globalsettings}
+badmemoryaccess         Yes
+
+Configura‡oes de EMS
+------------
+identificador           {emssettings}
+bootems                 Yes
+
+Configura‡oes do Depurador
+-----------------
+identificador           {dbgsettings}
+debugtype               Serial
+debugport               1
+baudrate                115200
+
+Defeitos de RAM
+-----------
+identificador           {badmemory}
+
+Configura‡oes Globais
+---------------
+identificador           {globalsettings}
+inherit                 {dbgsettings}
+                        {emssettings}
+                        {badmemory}
+
+Configura‡oes do Carregador de Inicializa‡ao
+--------------------
+identificador           {bootloadersettings}
+inherit                 {globalsettings}
+                        {hypervisorsettings}
+
+Configura‡oes do Hypervisor
+-------------------
+identificador           {hypervisorsettings}
+hypervisordebugtype     Serial
+hypervisordebugport     1
+hypervisorbaudrate      115200
+Configura‡oes do Carregador de Retorno
+----------------------
+identificador           {resumeloadersettings}
+inherit                 {globalsettings}
+
+Op‡oes de dispositivo
+--------------
+identificador           {1bc38f58-91ba-11e7-b898-94ca274a1017}
+description             Windows Recovery
+ramdisksdidevice        partition=M:
+ramdisksdipath          \Recovery\WindowsRE\boot.sdi
+
+Op‡oes de dispositivo
+--------------
+identificador           {443f2dc3-fe92-11d5-bafb-93163ce10289}
+description             Ramdisk Options
+ramdisksdidevice        partition=C:
+ramdisksdipath          \Recovery\443f2dc2-fe92-11d5-bafb-93163ce10289\boot.sdi

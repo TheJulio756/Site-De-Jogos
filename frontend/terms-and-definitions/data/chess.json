@@ -1,0 +1,51 @@
+[
+  {
+    "term": "Rei",
+    "definition": "A peça mais importante do xadrez, que deve ser protegida a todo custo. Move-se uma casa em qualquer direção e sua captura significa o fim da partida."
+  },
+  {
+    "term": "Rainha",
+    "definition": "A peça mais poderosa do tabuleiro, combinando os movimentos da torre e do bispo. Pode mover-se em qualquer direção por quantas casas desejar."
+  },
+  {
+    "term": "Torre",
+    "definition": "Peça que se move horizontalmente e verticalmente por quantas casas desejar. Participa do movimento especial chamado roque junto com o rei."
+  },
+  {
+    "term": "Bispo",
+    "definition": "Peça que se move diagonalmente por quantas casas desejar, sempre permanecendo nas casas da mesma cor durante toda a partida."
+  },
+  {
+    "term": "Cavalo",
+    "definition": "Única peça que pode 'saltar' sobre outras peças, movendo-se em formato de 'L': duas casas em uma direção e uma casa perpendicular."
+  },
+  {
+    "term": "Peão",
+    "definition": "A peça mais numerosa do xadrez, move-se uma casa para frente, mas captura diagonalmente. Pode ser promovido ao alcançar a oitava fileira."
+  },
+  {
+    "term": "Xeque",
+    "definition": "Situação em que o rei está sob ataque direto e deve ser movido, protegido ou o atacante deve ser capturado imediatamente."
+  },
+  {
+    "term": "Xeque-mate",
+    "definition": "Posição final do jogo onde o rei está em xeque e não há movimento legal que possa salvá-lo, resultando na vitória do oponente."
+  },
+  {
+    "term": "Roque",
+    "definition": "Movimento especial que envolve o rei e uma torre, permitindo maior segurança ao rei e desenvolvimento da torre simultaneamente."
+  },
+  {
+    "term": "En passant",
+    "definition": "Regra especial de captura de peão que permite capturar um peão adversário que avançou duas casas, como se tivesse avançado apenas uma."
+  },
+  {
+    "term": "Promoção",
+    "definition": "Transformação obrigatória de um peão que alcança a oitava fileira em qualquer peça (exceto rei), geralmente escolhe-se a rainha."
+  },
+  {
+    "term": "Empate",
+    "definition": "Resultado da partida quando não há vencedor, podendo ocorrer por afogamento, repetição de posições, regra dos 50 movimentos ou acordo mútuo."
+  }
+]
+

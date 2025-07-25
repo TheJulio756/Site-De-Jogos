@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo de Associação</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="game-container">
+    <header>
+      <h1>Jogo de Associação: Termos e Definições</h1>
+      <p id="timer">Tempo: 0 segundos</p>
+    </header>
+
+    <section class="game-section">
+      <div class="term-container">
+        <h2>Termos</h2>
+        <div id="terms" class="draggable-container"></div>
+      </div>
+
+      <div class="definition-container">
+        <h2>Definições</h2>
+        <div id="definitions" class="droppable-container"></div>
+      </div>
+    </section>
+
+    <footer>
+      <label for="dataSelector">Escolha um conjunto de dados:</label>
+      <select id="dataSelector">
+        <option value="data/chess.json">Xadrez</option>
+        <option value="data/ing-family-short.json">Palavras -ing (curto)</option>
+        <option value="data/actions.json">Ações</option>
+        <option value="data/games.json">Jogos</option>
+      </select>
+      <button id="loadData">Carregar</button>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="commons.js"></script>
+  <script src="score.js"></script>
+</body>
+</html>
+

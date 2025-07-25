@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Associação - ApproveIt Games</title>
+    <link rel="stylesheet" href="../../commons.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 1rem 0;
+        }
+
+        .player-name-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .player-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h2>Carregando jogo...</h2>
+            <p>Preparando termos e definições</p>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="title">🔗 Jogo de Associação</h1>
+            <p>Arraste cada termo para sua definição correspondente</p>
+        </div>
+
+        <div class="instructions">
+            <p>📱 <strong>Como jogar:</strong> Arraste os termos da esquerda para as definições correspondentes da direita. Use o mouse no desktop ou toque e arraste no celular.</p>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-label">Tempo</div>
+                <div class="stat-value" id="timer">00:00</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Associações Corretas</div>
+                <div class="stat-value" id="correct-associations">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total de Termos</div>
+                <div class="stat-value" id="total-terms">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Tentativas</div>
+                <div class="stat-value" id="attempts">0</div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="btn btn-secondary" onclick="goToMenu()">← Menu</button>
+            <button class="btn" onclick="restartGame()">🔄 Reiniciar</button>
+        </div>
+
+        <div class="game-section">
+            <div class="term-container">
+                <h2>Termos</h2>
+                <div id="terms" class="draggable-container"></div>
+            </div>
+
+            <div class="definition-container">
+                <h2>Definições</h2>
+                <div id="definitions" class="droppable-container"></div>
+            </div>
+        </div>
+
+        <!-- Feedback do jogo -->
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- Modal de fim de jogo -->
+    <div class="game-over-modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2>🎉 Parabéns!</h2>
+            <p>Você completou o jogo de associação!</p>
+            
+            <div class="score-display" id="final-score">0 pontos</div>
+            
+            <div id="game-stats-final">
+                <p><strong>Tempo:</strong> <span id="final-time">00:00</span></p>
+                <p><strong>Associações corretas:</strong> <span id="final-associations">0</span></p>
+                <p><strong>Tentativas:</strong> <span id="final-attempts">0</span></p>
+            </div>
+
+            <input 
+                type="text" 
+                id="player-name" 
+                class="player-name-input" 
+                placeholder="Digite seu nome para salvar o resultado"
+                maxlength="50"
+            >
+
+            <div id="save-message"></div>
+
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="saveResult()">💾 Salvar Resultado</button>
+                <button class="btn btn-secondary" onclick="playAgain()">🔄 Jogar Novamente</button>
+                <button class="btn btn-secondary" onclick="goToMenu()">🏠 Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../commons.js"></script>
+    <script>
+        let gameData = null;
+        let correctAssociations = 0;
+        let attempts = 0;
+        let startTime = null;
+        let gameTimer = null;
+        let gameStarted = false;
+        let draggedElement = null;
+
+        // Inicializar jogo
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameData();
+        });
+
+        // Carregar dados do jogo
+        function loadGameData() {
+            try {
+                const storedGame = localStorage.getItem('currentGame');
+                if (!storedGame) {
+                    showError('Nenhum jogo encontrado. Redirecionando para a seleção de jogos...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                gameData = JSON.parse(storedGame);
+                
+                if (gameData.gameType !== 'association') {
+                    showError('Tipo de jogo incorreto. Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                initializeGame();
+            } catch (error) {
+                console.error('Erro ao carregar dados do jogo:', error);
+                showError('Erro ao carregar o jogo. Redirecionando...');
+                setTimeout(() => {
+                    window.location.href = '/games.html';
+                }, 3000);
+            }
+        }
+
+        // Inicializar jogo
+        function initializeGame() {
+            correctAssociations = 0;
+            attempts = 0;
+            gameStarted = false;
+            
+            document.getElementById('total-terms').textContent = gameData.terms.length;
+            document.getElementById('correct-associations').textContent = '0';
+            document.getElementById('attempts').textContent = '0';
+            document.getElementById('timer').textContent = '00:00';
+            
+            createGameElements();
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+
+        // Criar elementos do jogo
+        function createGameElements() {
+            const termsContainer = document.getElementById('terms');
+            const definitionsContainer = document.getElementById('definitions');
+            
+            termsContainer.innerHTML = '';
+            definitionsContainer.innerHTML = '';
+
+            // Criar termos (arrastavéis)
+            gameData.terms.forEach(term => {
+                const termElement = document.createElement('div');
+                termElement.className = 'draggable-item';
+                termElement.draggable = true;
+                termElement.dataset.id = term.id;
+                termElement.textContent = term.content;
+                
+                // Eventos de drag
+                termElement.addEventListener('dragstart', handleDragStart);
+                termElement.addEventListener('dragend', handleDragEnd);
+                
+                // Eventos de touch para dispositivos móveis
+                termElement.addEventListener('touchstart', handleTouchStart);
+                termElement.addEventListener('touchmove', handleTouchMove);
+                termElement.addEventListener('touchend', handleTouchEnd);
+                
+                termsContainer.appendChild(termElement);
+            });
+
+            // Criar definições (áreas de drop)
+            gameData.definitions.forEach(definition => {
+                const definitionElement = document.createElement('div');
+                definitionElement.className = 'droppable-item';
+                definitionElement.dataset.id = definition.id;
+                definitionElement.innerHTML = `
+                    <div class="definition-content">${escapeHtml(definition.content)}</div>
+                    <div class="drop-zone">Arraste o termo aqui</div>
+                `;
+                
+                // Eventos de drop
+                definitionElement.addEventListener('dragover', handleDragOver);
+                definitionElement.addEventListener('drop', handleDrop);
+                
+                definitionsContainer.appendChild(definitionElement);
+            });
+        }
+
+        // Eventos de drag and drop
+        function handleDragStart(e) {
+            if (!gameStarted) {
+                startGame();
+            }
+            
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                checkAssociation(draggedElement, e.currentTarget);
+            }
+        }
+
+        // Eventos de touch para dispositivos móveis
+        let touchStartPos = { x: 0, y: 0 };
+        let touchElement = null;
+
+        function handleTouchStart(e) {
+            if (!gameStarted) {
+                startGame();
+            }
+            
+            touchElement = e.target;
+            const touch = e.touches[0];
+            touchStartPos = { x: touch.clientX, y: touch.clientY };
+            
+            e.target.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            
+            if (!touchElement) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartPos.x;
+            const deltaY = touch.clientY - touchStartPos.y;
+            
+            touchElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            touchElement.style.zIndex = '1000';
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchElement) return;
+            
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Resetar posição
+            touchElement.style.transform = '';
+            touchElement.style.zIndex = '';
+            touchElement.classList.remove('dragging');
+            
+            // Verificar se foi solto em uma definição
+            const dropTarget = elementBelow?.closest('.droppable-item');
+            if (dropTarget) {
+                checkAssociation(touchElement, dropTarget);
+            }
+            
+            touchElement = null;
+        }
+
+        // Verificar associação
+        function checkAssociation(termElement, definitionElement) {
+            attempts++;
+            document.getElementById('attempts').textContent = attempts;
+            
+            const termId = parseInt(termElement.dataset.id);
+            const definitionId = parseInt(definitionElement.dataset.id);
+            
+            if (termId === definitionId) {
+                // Associação correta
+                termElement.classList.add('matched');
+                definitionElement.classList.add('matched');
+                
+                // Mover termo para a definição
+                const dropZone = definitionElement.querySelector('.drop-zone');
+                dropZone.innerHTML = `<div class="matched-term">${escapeHtml(termElement.textContent)}</div>`;
+                
+                // Remover termo da lista
+                termElement.style.display = 'none';
+                
+                correctAssociations++;
+                document.getElementById('correct-associations').textContent = correctAssociations;
+                
+                showFeedback('✅ Associação correta!', 'success');
+                playSound('bell');
+                
+                // Verificar se o jogo terminou
+                if (correctAssociations === gameData.terms.length) {
+                    setTimeout(() => {
+                        endGame();
+                    }, 1000);
+                }
+            } else {
+                // Associação incorreta
+                showFeedback('❌ Associação incorreta. Tente novamente!', 'error');
+                playSound('caught');
+                
+                // Efeito visual de erro
+                definitionElement.classList.add('error');
+                setTimeout(() => {
+                    definitionElement.classList.remove('error');
+                }, 1000);
+            }
+        }
+
+        // Iniciar cronômetro
+        function startGame() {
+            gameStarted = true;
+            startTime = Date.now();
+            
+            gameTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Finalizar jogo
+        function endGame() {
+            clearInterval(gameTimer);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const score = calculateScore(totalTime);
+            
+            // Preencher modal de fim de jogo
+            document.getElementById('final-score').textContent = `${score} pontos`;
+            document.getElementById('final-time').textContent = formatTime(totalTime);
+            document.getElementById('final-associations').textContent = correctAssociations;
+            document.getElementById('final-attempts').textContent = attempts;
+            
+            // Mostrar modal
+            document.getElementById('game-over-modal').style.display = 'flex';
+            
+            playSound('win');
+        }
+
+        // Calcular pontuação
+        function calculateScore(timeInSeconds) {
+            const baseScore = correctAssociations * 150;
+            const timeBonus = Math.max(0, 240 - timeInSeconds); // Bônus por tempo (máximo 4 minutos)
+            const accuracyBonus = correctAssociations === gameData.terms.length ? 300 : 0; // Bônus por completar
+            const efficiencyBonus = attempts === gameData.terms.length ? 400 : 0; // Bônus por eficiência perfeita
+            
+            return Math.round(baseScore + timeBonus + accuracyBonus + efficiencyBonus);
+        }
+
+        // Salvar resultado
+        async function saveResult() {
+            const playerName = document.getElementById('player-name').value.trim();
+            
+            if (!playerName) {
+                showSaveMessage('Digite seu nome para salvar o resultado', 'error');
+                return;
+            }
+
+            try {
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                const score = calculateScore(totalTime);
+                
+                const resultData = {
+                    gameType: 'association',
+                    playerName: playerName,
+                    score: score,
+                    correctAnswers: correctAssociations,
+                    wrongAnswers: attempts - correctAssociations,
+                    gameTime: totalTime
+                };
+
+                // Adicionar gameId se for um jogo compartilhado
+                const sharedGameInfo = localStorage.getItem('sharedGameInfo');
+                if (sharedGameInfo) {
+                    const gameInfo = JSON.parse(sharedGameInfo);
+                    resultData.gameId = gameInfo.gameId;
+                }
+
+                const response = await fetch('/api/results', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resultData)
+                });
+
+                if (response.ok) {
+                    showSaveMessage('Resultado salvo com sucesso! 🎉', 'success');
+                    document.getElementById('player-name').disabled = true;
+                } else {
+                    const error = await response.json();
+                    showSaveMessage('Erro ao salvar resultado: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar resultado:', error);
+                showSaveMessage('Erro ao salvar resultado', 'error');
+            }
+        }
+
+        // Mostrar mensagem de salvamento
+        function showSaveMessage(message, type) {
+            const container = document.getElementById('save-message');
+            container.innerHTML = `<div class="${type === 'success' ? 'success' : 'error-message'}" style="margin: 1rem 0; padding: 0.5rem; border-radius: 5px;">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Jogar novamente
+        function playAgain() {
+            document.getElementById('game-over-modal').style.display = 'none';
+            restartGame();
+        }
+
+        // Reiniciar jogo
+        function restartGame() {
+            clearInterval(gameTimer);
+            
+            // Embaralhar definições novamente
+            gameData.definitions = shuffleArray(gameData.definitions);
+            initializeGame();
+        }
+
+        // Ir para o menu
+        function goToMenu() {
+            clearInterval(gameTimer);
+            window.location.href = '/indexcomeco.html';
+        }
+
+        // Embaralhar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Mostrar feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2000);
+        }
+
+        // Tocar som
+        function playSound(soundName) {
+            try {
+                const audio = new Audio(`../sounds/${soundName}.wav`);
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log('Erro ao tocar som:', e));
+            } catch (error) {
+                console.log('Som não disponível:', soundName);
+            }
+        }
+
+        // Formatar tempo
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('loading-screen').innerHTML = `
+                <div class="loading-content">
+                    <div class="error-message">${message}</div>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+

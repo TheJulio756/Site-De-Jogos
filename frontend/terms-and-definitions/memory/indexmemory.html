@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória - ApproveIt Games</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../commons.css">
+    <style>
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 1rem 0;
+        }
+
+        .player-name-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .player-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h2>Carregando jogo...</h2>
+            <p>Preparando suas cartas</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="game-header">
+            <h1 class="title">🧠 Jogo da Memória</h1>
+            <p>Encontre os pares correspondentes entre termos e definições</p>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-label">Tempo</div>
+                <div class="stat-value" id="timer">00:00</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Pares Encontrados</div>
+                <div class="stat-value" id="pairs-found">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total de Pares</div>
+                <div class="stat-value" id="total-pairs">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Tentativas</div>
+                <div class="stat-value" id="attempts">0</div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="btn btn-secondary" onclick="goToMenu()">← Menu</button>
+            <button class="btn" onclick="restartGame()">🔄 Reiniciar</button>
+        </div>
+        
+        <!-- Tabuleiro do jogo -->
+        <div id="game-board" class="game-board"></div>
+        
+        <!-- Feedback do jogo -->
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- Modal de fim de jogo -->
+    <div class="game-over-modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2>🎉 Parabéns!</h2>
+            <p>Você completou o jogo da memória!</p>
+            
+            <div class="score-display" id="final-score">0 pontos</div>
+            
+            <div id="game-stats-final">
+                <p><strong>Tempo:</strong> <span id="final-time">00:00</span></p>
+                <p><strong>Pares encontrados:</strong> <span id="final-pairs">0</span></p>
+                <p><strong>Tentativas:</strong> <span id="final-attempts">0</span></p>
+            </div>
+
+            <input 
+                type="text" 
+                id="player-name" 
+                class="player-name-input" 
+                placeholder="Digite seu nome para salvar o resultado"
+                maxlength="50"
+            >
+
+            <div id="save-message"></div>
+
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="saveResult()">💾 Salvar Resultado</button>
+                <button class="btn btn-secondary" onclick="playAgain()">🔄 Jogar Novamente</button>
+                <button class="btn btn-secondary" onclick="goToMenu()">🏠 Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../commons.js"></script>
+    <script>
+        let gameData = null;
+        let gameBoard = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let attempts = 0;
+        let startTime = null;
+        let gameTimer = null;
+        let gameStarted = false;
+
+        // Inicializar jogo
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameData();
+        });
+
+        // Carregar dados do jogo
+        function loadGameData() {
+            try {
+                const storedGame = localStorage.getItem('currentGame');
+                if (!storedGame) {
+                    showError('Nenhum jogo encontrado. Redirecionando para a seleção de jogos...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                gameData = JSON.parse(storedGame);
+                
+                if (gameData.gameType !== 'memory') {
+                    showError('Tipo de jogo incorreto. Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                initializeGame();
+            } catch (error) {
+                console.error('Erro ao carregar dados do jogo:', error);
+                showError('Erro ao carregar o jogo. Redirecionando...');
+                setTimeout(() => {
+                    window.location.href = '/games.html';
+                }, 3000);
+            }
+        }
+
+        // Inicializar jogo
+        function initializeGame() {
+            gameBoard = [...gameData.cards];
+            matchedPairs = 0;
+            attempts = 0;
+            flippedCards = [];
+            gameStarted = false;
+            
+            document.getElementById('total-pairs').textContent = gameData.totalPairs;
+            document.getElementById('pairs-found').textContent = '0';
+            document.getElementById('attempts').textContent = '0';
+            document.getElementById('timer').textContent = '00:00';
+            
+            createGameBoard();
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+
+        // Criar tabuleiro do jogo
+        function createGameBoard() {
+            const boardElement = document.getElementById('game-board');
+            boardElement.innerHTML = '';
+            
+            // Calcular grid baseado no número de cartas
+            const totalCards = gameBoard.length;
+            const cols = Math.ceil(Math.sqrt(totalCards));
+            const rows = Math.ceil(totalCards / cols);
+            
+            boardElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            boardElement.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+            gameBoard.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.dataset.index = index;
+                cardElement.dataset.pairId = card.pairId;
+                cardElement.dataset.type = card.type;
+                
+                cardElement.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">?</div>
+                        <div class="card-back">
+                            <div class="card-content">${escapeHtml(card.content)}</div>
+                            <div class="card-type">${card.type === 'term' ? 'Termo' : 'Definição'}</div>
+                        </div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', () => flipCard(index));
+                boardElement.appendChild(cardElement);
+            });
+        }
+
+        // Virar carta
+        function flipCard(index) {
+            if (!gameStarted) {
+                startGame();
+            }
+
+            const cardElement = document.querySelector(`[data-index="${index}"]`);
+            
+            // Verificar se a carta já está virada ou se já temos 2 cartas viradas
+            if (cardElement.classList.contains('flipped') || flippedCards.length >= 2) {
+                return;
+            }
+
+            // Virar carta
+            cardElement.classList.add('flipped');
+            flippedCards.push(index);
+
+            // Verificar se temos 2 cartas viradas
+            if (flippedCards.length === 2) {
+                attempts++;
+                document.getElementById('attempts').textContent = attempts;
+                
+                setTimeout(() => {
+                    checkMatch();
+                }, 1000);
+            }
+        }
+
+        // Verificar se as cartas formam um par
+        function checkMatch() {
+            const [index1, index2] = flippedCards;
+            const card1 = gameBoard[index1];
+            const card2 = gameBoard[index2];
+            
+            const cardElement1 = document.querySelector(`[data-index="${index1}"]`);
+            const cardElement2 = document.querySelector(`[data-index="${index2}"]`);
+
+            if (card1.pairId === card2.pairId) {
+                // Par encontrado
+                cardElement1.classList.add('matched');
+                cardElement2.classList.add('matched');
+                
+                matchedPairs++;
+                document.getElementById('pairs-found').textContent = matchedPairs;
+                
+                showFeedback('✅ Par encontrado!', 'success');
+                playSound('bell');
+                
+                // Verificar se o jogo terminou
+                if (matchedPairs === gameData.totalPairs) {
+                    setTimeout(() => {
+                        endGame();
+                    }, 1000);
+                }
+            } else {
+                // Não é um par
+                cardElement1.classList.remove('flipped');
+                cardElement2.classList.remove('flipped');
+                
+                showFeedback('❌ Não é um par. Tente novamente!', 'error');
+                playSound('caught');
+            }
+
+            flippedCards = [];
+        }
+
+        // Iniciar cronômetro
+        function startGame() {
+            gameStarted = true;
+            startTime = Date.now();
+            
+            gameTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Finalizar jogo
+        function endGame() {
+            clearInterval(gameTimer);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const score = calculateScore(totalTime);
+            
+            // Preencher modal de fim de jogo
+            document.getElementById('final-score').textContent = `${score} pontos`;
+            document.getElementById('final-time').textContent = formatTime(totalTime);
+            document.getElementById('final-pairs').textContent = matchedPairs;
+            document.getElementById('final-attempts').textContent = attempts;
+            
+            // Mostrar modal
+            document.getElementById('game-over-modal').style.display = 'flex';
+            
+            playSound('win');
+        }
+
+        // Calcular pontuação
+        function calculateScore(timeInSeconds) {
+            const baseScore = matchedPairs * 100;
+            const timeBonus = Math.max(0, 300 - timeInSeconds); // Bônus por tempo (máximo 5 minutos)
+            const accuracyBonus = matchedPairs === gameData.totalPairs ? 200 : 0; // Bônus por completar
+            const efficiencyBonus = attempts === gameData.totalPairs ? 300 : 0; // Bônus por eficiência perfeita
+            
+            return Math.round(baseScore + timeBonus + accuracyBonus + efficiencyBonus);
+        }
+
+        // Salvar resultado
+        async function saveResult() {
+            const playerName = document.getElementById('player-name').value.trim();
+            
+            if (!playerName) {
+                showSaveMessage('Digite seu nome para salvar o resultado', 'error');
+                return;
+            }
+
+            try {
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                const score = calculateScore(totalTime);
+                
+                const resultData = {
+                    gameType: 'memory',
+                    playerName: playerName,
+                    score: score,
+                    correctAnswers: matchedPairs,
+                    wrongAnswers: attempts - matchedPairs,
+                    gameTime: totalTime
+                };
+
+                // Adicionar gameId se for um jogo compartilhado
+                const sharedGameInfo = localStorage.getItem('sharedGameInfo');
+                if (sharedGameInfo) {
+                    const gameInfo = JSON.parse(sharedGameInfo);
+                    resultData.gameId = gameInfo.gameId;
+                }
+
+                const response = await fetch('/api/results', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resultData)
+                });
+
+                if (response.ok) {
+                    showSaveMessage('Resultado salvo com sucesso! 🎉', 'success');
+                    document.getElementById('player-name').disabled = true;
+                } else {
+                    const error = await response.json();
+                    showSaveMessage('Erro ao salvar resultado: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar resultado:', error);
+                showSaveMessage('Erro ao salvar resultado', 'error');
+            }
+        }
+
+        // Mostrar mensagem de salvamento
+        function showSaveMessage(message, type) {
+            const container = document.getElementById('save-message');
+            container.innerHTML = `<div class="${type === 'success' ? 'success' : 'error-message'}" style="margin: 1rem 0; padding: 0.5rem; border-radius: 5px;">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Jogar novamente
+        function playAgain() {
+            document.getElementById('game-over-modal').style.display = 'none';
+            restartGame();
+        }
+
+        // Reiniciar jogo
+        function restartGame() {
+            clearInterval(gameTimer);
+            
+            // Remover classes das cartas
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('flipped', 'matched');
+            });
+            
+            // Embaralhar cartas novamente
+            gameData.cards = shuffleArray(gameData.cards);
+            initializeGame();
+        }
+
+        // Ir para o menu
+        function goToMenu() {
+            clearInterval(gameTimer);
+            window.location.href = '/indexcomeco.html';
+        }
+
+        // Embaralhar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Mostrar feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            
+            setTimeout(() => {
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }, 2000);
+        }
+
+        // Tocar som
+        function playSound(soundName) {
+            try {
+                const audio = new Audio(`../sounds/${soundName}.wav`);
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log('Erro ao tocar som:', e));
+            } catch (error) {
+                console.log('Som não disponível:', soundName);
+            }
+        }
+
+        // Formatar tempo
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('loading-screen').innerHTML = `
+                <div class="loading-content">
+                    <div class="error-message">${message}</div>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+

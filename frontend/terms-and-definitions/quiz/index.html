@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - ApproveIt Games</title>
+    <link rel="stylesheet" href="../../commons.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 1rem 0;
+        }
+
+        .player-name-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .player-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h2>Carregando quiz...</h2>
+            <p>Preparando perguntas</p>
+        </div>
+    </div>
+
+    <div class="quiz-container">
+        <div class="game-header">
+            <h1>❓ Quiz</h1>
+            <p>Responda às perguntas de múltipla escolha</p>
+        </div>
+
+        <div class="instructions">
+            <p>📝 <strong>Como jogar:</strong> Leia cada termo apresentado e selecione a definição correta entre as alternativas. Você tem tempo limitado para cada pergunta!</p>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-label">Tempo</div>
+                <div class="stat-value" id="timer">00:00</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Pergunta</div>
+                <div class="stat-value" id="question-counter">0/0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Acertos</div>
+                <div class="stat-value" id="correct-answers">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Pontuação</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="game-controls">
+            <button class="btn btn-secondary" onclick="goToMenu()">← Menu</button>
+            <button class="btn" onclick="restartGame()">🔄 Reiniciar</button>
+        </div>
+        
+        <div id="quiz">
+            <div id="question"></div>
+            <div id="options"></div>
+            <button id="nextBtn" class="btn" style="display: none;">Próxima Pergunta</button>
+        </div>
+        
+        <div id="feedback"></div>
+    </div>
+
+    <!-- Modal de fim de jogo -->
+    <div class="game-over-modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2>🎉 Quiz Concluído!</h2>
+            <p>Você terminou o quiz!</p>
+            
+            <div class="score-display" id="final-score">0 pontos</div>
+            
+            <div id="game-stats-final">
+                <p><strong>Tempo total:</strong> <span id="final-time">00:00</span></p>
+                <p><strong>Acertos:</strong> <span id="final-correct">0</span> de <span id="final-total">0</span></p>
+                <p><strong>Porcentagem:</strong> <span id="final-percentage">0%</span></p>
+            </div>
+
+            <input 
+                type="text" 
+                id="player-name" 
+                class="player-name-input" 
+                placeholder="Digite seu nome para salvar o resultado"
+                maxlength="50"
+            >
+
+            <div id="save-message"></div>
+
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="saveResult()">💾 Salvar Resultado</button>
+                <button class="btn btn-secondary" onclick="playAgain()">🔄 Jogar Novamente</button>
+                <button class="btn btn-secondary" onclick="goToMenu()">🏠 Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../commons.js"></script>
+    <script>
+        let gameData = null;
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let totalScore = 0;
+        let startTime = null;
+        let gameTimer = null;
+        let gameStarted = false;
+        let selectedAnswer = null;
+
+        // Inicializar jogo
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameData();
+        });
+
+        // Carregar dados do jogo
+        function loadGameData() {
+            try {
+                const storedGame = localStorage.getItem('currentGame');
+                if (!storedGame) {
+                    showError('Nenhum jogo encontrado. Redirecionando para a seleção de jogos...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                gameData = JSON.parse(storedGame);
+                
+                if (gameData.gameType !== 'quiz') {
+                    showError('Tipo de jogo incorreto. Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = '/games.html';
+                    }, 3000);
+                    return;
+                }
+
+                initializeGame();
+            } catch (error) {
+                console.error('Erro ao carregar dados do jogo:', error);
+                showError('Erro ao carregar o jogo. Redirecionando...');
+                setTimeout(() => {
+                    window.location.href = '/games.html';
+                }, 3000);
+            }
+        }
+
+        // Inicializar jogo
+        function initializeGame() {
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            totalScore = 0;
+            selectedAnswer = null;
+            gameStarted = false;
+            
+            updateStats();
+            showQuestion();
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+
+        // Atualizar estatísticas
+        function updateStats() {
+            document.getElementById('question-counter').textContent = 
+                `${currentQuestionIndex + 1}/${gameData.questions.length}`;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+            document.getElementById('score').textContent = totalScore;
+            
+            // Atualizar barra de progresso
+            const progress = ((currentQuestionIndex + 1) / gameData.questions.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        // Mostrar pergunta atual
+        function showQuestion() {
+            if (!gameStarted) {
+                startGame();
+            }
+
+            if (currentQuestionIndex >= gameData.questions.length) {
+                endGame();
+                return;
+            }
+
+            const question = gameData.questions[currentQuestionIndex];
+            selectedAnswer = null;
+            
+            // Mostrar pergunta
+            document.getElementById('question').innerHTML = `
+                <h2>Qual é a definição de:</h2>
+                <div class="question-term">${escapeHtml(question.question)}</div>
+            `;
+            
+            // Mostrar opções
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.dataset.index = index;
+                optionElement.innerHTML = `
+                    <span class="option-letter">${String.fromCharCode(65 + index)}</span>
+                    <span class="option-text">${escapeHtml(answer)}</span>
+                `;
+                
+                optionElement.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Esconder botão próxima
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            // Limpar feedback
+            document.getElementById('feedback').innerHTML = '';
+            
+            updateStats();
+        }
+
+        // Selecionar resposta
+        function selectAnswer(answerIndex) {
+            if (selectedAnswer !== null) return; // Já respondeu
+            
+            selectedAnswer = answerIndex;
+            const question = gameData.questions[currentQuestionIndex];
+            const isCorrect = answerIndex === question.correctAnswer;
+            
+            // Marcar opções
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                
+                if (index === question.correctAnswer) {
+                    option.classList.add('correct');
+                } else if (index === answerIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                
+                if (index === answerIndex) {
+                    option.classList.add('selected');
+                }
+                
+                // Desabilitar cliques
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Atualizar pontuação e feedback
+            if (isCorrect) {
+                correctAnswers++;
+                const questionScore = calculateQuestionScore();
+                totalScore += questionScore;
+                
+                showFeedback(`✅ Correto! +${questionScore} pontos`, 'success');
+                playSound('bell');
+            } else {
+                showFeedback(`❌ Incorreto. ${question.explanation}`, 'error');
+                playSound('caught');
+            }
+            
+            updateStats();
+            
+            // Mostrar botão próxima ou finalizar
+            setTimeout(() => {
+                if (currentQuestionIndex < gameData.questions.length - 1) {
+                    document.getElementById('nextBtn').style.display = 'inline-block';
+                    document.getElementById('nextBtn').onclick = nextQuestion;
+                } else {
+                    document.getElementById('nextBtn').textContent = 'Ver Resultado';
+                    document.getElementById('nextBtn').style.display = 'inline-block';
+                    document.getElementById('nextBtn').onclick = endGame;
+                }
+            }, 2000);
+        }
+
+        // Próxima pergunta
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        // Calcular pontuação da pergunta
+        function calculateQuestionScore() {
+            const baseScore = 200;
+            const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
+            const timePerQuestion = timeElapsed / (currentQuestionIndex + 1);
+            const timeBonus = Math.max(0, 30 - timePerQuestion); // Bônus por responder rápido
+            
+            return Math.round(baseScore + timeBonus * 10);
+        }
+
+        // Iniciar cronômetro
+        function startGame() {
+            gameStarted = true;
+            startTime = Date.now();
+            
+            gameTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Finalizar jogo
+        function endGame() {
+            clearInterval(gameTimer);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const percentage = Math.round((correctAnswers / gameData.questions.length) * 100);
+            
+            // Preencher modal de fim de jogo
+            document.getElementById('final-score').textContent = `${totalScore} pontos`;
+            document.getElementById('final-time').textContent = formatTime(totalTime);
+            document.getElementById('final-correct').textContent = correctAnswers;
+            document.getElementById('final-total').textContent = gameData.questions.length;
+            document.getElementById('final-percentage').textContent = `${percentage}%`;
+            
+            // Mostrar modal
+            document.getElementById('game-over-modal').style.display = 'flex';
+            
+            playSound('win');
+        }
+
+        // Salvar resultado
+        async function saveResult() {
+            const playerName = document.getElementById('player-name').value.trim();
+            
+            if (!playerName) {
+                showSaveMessage('Digite seu nome para salvar o resultado', 'error');
+                return;
+            }
+
+            try {
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                
+                const resultData = {
+                    gameType: 'quiz',
+                    playerName: playerName,
+                    score: totalScore,
+                    correctAnswers: correctAnswers,
+                    wrongAnswers: gameData.questions.length - correctAnswers,
+                    gameTime: totalTime
+                };
+
+                // Adicionar gameId se for um jogo compartilhado
+                const sharedGameInfo = localStorage.getItem('sharedGameInfo');
+                if (sharedGameInfo) {
+                    const gameInfo = JSON.parse(sharedGameInfo);
+                    resultData.gameId = gameInfo.gameId;
+                }
+
+                const response = await fetch('/api/results', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(resultData)
+                });
+
+                if (response.ok) {
+                    showSaveMessage('Resultado salvo com sucesso! 🎉', 'success');
+                    document.getElementById('player-name').disabled = true;
+                } else {
+                    const error = await response.json();
+                    showSaveMessage('Erro ao salvar resultado: ' + error.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar resultado:', error);
+                showSaveMessage('Erro ao salvar resultado', 'error');
+            }
+        }
+
+        // Mostrar mensagem de salvamento
+        function showSaveMessage(message, type) {
+            const container = document.getElementById('save-message');
+            container.innerHTML = `<div class="${type === 'success' ? 'success' : 'error-message'}" style="margin: 1rem 0; padding: 0.5rem; border-radius: 5px;">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Jogar novamente
+        function playAgain() {
+            document.getElementById('game-over-modal').style.display = 'none';
+            restartGame();
+        }
+
+        // Reiniciar jogo
+        function restartGame() {
+            clearInterval(gameTimer);
+            
+            // Embaralhar perguntas novamente
+            gameData.questions = shuffleArray(gameData.questions);
+            initializeGame();
+        }
+
+        // Ir para o menu
+        function goToMenu() {
+            clearInterval(gameTimer);
+            window.location.href = '/indexcomeco.html';
+        }
+
+        // Embaralhar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Mostrar feedback
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `<div class="feedback ${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 4000);
+        }
+
+        // Tocar som
+        function playSound(soundName) {
+            try {
+                const audio = new Audio(`../sounds/${soundName}.wav`);
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log('Erro ao tocar som:', e));
+            } catch (error) {
+                console.log('Som não disponível:', soundName);
+            }
+        }
+
+        // Formatar tempo
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('loading-screen').innerHTML = `
+                <div class="loading-content">
+                    <div class="error-message">${message}</div>
+                </div>
+            `;
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+

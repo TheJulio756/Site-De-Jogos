@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça-Palavras - Termos e Definições</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>🔍 Caça-Palavras</h1>
+            <p class="game-description">Encontre os termos escondidos na grade!</p>
+            <div class="game-info">
+                <div class="timer">
+                    <span>⏱️ Tempo: </span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="score">
+                    <span>🎯 Pontos: </span>
+                    <span id="score">0</span>
+                </div>
+                <div class="found-words">
+                    <span>📝 Encontradas: </span>
+                    <span id="found-count">0</span>/<span id="total-count">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <div class="game-board">
+                <div id="word-grid" class="word-grid"></div>
+            </div>
+            
+            <div class="game-sidebar">
+                <div class="words-to-find">
+                    <h3>Termos para encontrar:</h3>
+                    <div id="word-list" class="word-list"></div>
+                </div>
+                
+                <div class="definitions-panel">
+                    <h3>Definições:</h3>
+                    <div id="definitions-list" class="definitions-list"></div>
+                </div>
+            </div>
+        </main>
+
+        <div class="game-controls">
+            <button id="new-game-btn" class="btn btn-primary">Novo Jogo</button>
+            <button id="hint-btn" class="btn btn-secondary">Dica</button>
+            <button id="back-btn" class="btn btn-back" onclick="window.history.back()">Voltar</button>
+        </div>
+
+        <div id="game-complete-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>🎉 Parabéns!</h2>
+                <p>Você encontrou todas as palavras!</p>
+                <div class="final-stats">
+                    <p>Tempo: <span id="final-time"></span></p>
+                    <p>Pontuação: <span id="final-score"></span></p>
+                </div>
+                <div class="modal-actions">
+                    <button id="play-again-btn" class="btn btn-primary">Jogar Novamente</button>
+                    <button id="close-modal-btn" class="btn btn-secondary">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../commons.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

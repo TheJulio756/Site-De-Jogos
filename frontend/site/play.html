@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogar - ApproveIt Games</title>
+    <link rel="stylesheet" href="commons.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .code-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .code-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .code-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 1rem;
+            border: 3px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .game-info {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .game-info h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .game-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .game-type-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: #e6f7e6;
+            color: #00b894;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .instructions p {
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .game-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Jogar Jogo</h1>
+            <p>Digite o código do jogo para começar a jogar</p>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-links">
+                <a href="indexcomeco.html">Início</a>
+                <a href="terms.html">Termos</a>
+                <a href="games.html">Jogos</a>
+            </div>
+            <a href="indexcomeco.html" class="back-btn">← Voltar</a>
+        </div>
+
+        <div id="message-container"></div>
+
+        <div class="code-section">
+            <h2>Digite o Código do Jogo</h2>
+            <input 
+                type="text" 
+                id="game-code" 
+                class="code-input" 
+                placeholder="ABC123"
+                maxlength="6"
+                autocomplete="off"
+            >
+            <br>
+            <button class="btn" onclick="loadGame()">Carregar Jogo</button>
+        </div>
+
+        <div class="game-info" id="game-info">
+            <h2>Informações do Jogo</h2>
+            
+            <div class="game-type-badge" id="game-type-badge"></div>
+            
+            <div class="game-details">
+                <div class="detail-item">
+                    <div class="detail-label">Criado por</div>
+                    <div class="detail-value" id="creator-name">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Número de Termos</div>
+                    <div class="detail-value" id="terms-count">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Data de Criação</div>
+                    <div class="detail-value" id="creation-date">-</div>
+                </div>
+            </div>
+
+            <div class="instructions" id="game-instructions">
+                <h3>Como Jogar</h3>
+                <p id="instructions-text">Carregando instruções...</p>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn" onclick="startGame()" style="font-size: 1.2rem; padding: 1rem 3rem;">
+                    🚀 Começar a Jogar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGame = null;
+
+        // Verificar se há código na URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                document.getElementById('game-code').value = code.toUpperCase();
+                loadGame();
+            }
+        });
+
+        // Permitir apenas letras e números no input
+        document.getElementById('game-code').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        // Carregar jogo ao pressionar Enter
+        document.getElementById('game-code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadGame();
+            }
+        });
+
+        // Carregar jogo pelo código
+        async function loadGame() {
+            const code = document.getElementById('game-code').value.trim();
+            
+            if (!code) {
+                showMessage('Digite um código de jogo', 'error');
+                return;
+            }
+
+            if (code.length !== 6) {
+                showMessage('O código deve ter 6 caracteres', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Carregando jogo...', 'loading');
+                
+                const response = await fetch(`/api/games/${code}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Jogo não encontrado. Verifique o código e tente novamente.');
+                    }
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erro ao carregar jogo');
+                }
+
+                const gameData = await response.json();
+                currentGame = gameData;
+                
+                displayGameInfo(gameData);
+                document.getElementById('message-container').innerHTML = '';
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage(error.message, 'error');
+                document.getElementById('game-info').style.display = 'none';
+            }
+        }
+
+        // Exibir informações do jogo
+        function displayGameInfo(gameData) {
+            // Mapear tipos de jogo
+            const gameTypeNames = {
+                'memory': '🧠 Jogo da Memória',
+                'association': '🔗 Jogo de Associação',
+                'quiz': '❓ Quiz'
+            };
+
+            const gameInstructions = {
+                'memory': 'Encontre os pares correspondentes entre termos e definições. Clique nas cartas para virá-las e tente formar todos os pares no menor tempo possível.',
+                'association': 'Arraste cada termo para sua definição correspondente. Use o mouse ou toque para conectar os termos às suas definições corretas.',
+                'quiz': 'Responda às perguntas de múltipla escolha. Leia cada termo apresentado e selecione a definição correta entre as alternativas.'
+            };
+
+            // Preencher informações
+            document.getElementById('game-type-badge').textContent = gameTypeNames[gameData.gameType] || gameData.gameType;
+            document.getElementById('creator-name').textContent = gameData.createdBy.username;
+            document.getElementById('terms-count').textContent = gameData.terms.length;
+            document.getElementById('creation-date').textContent = new Date(gameData.createdAt).toLocaleDateString('pt-BR');
+            document.getElementById('instructions-text').textContent = gameInstructions[gameData.gameType] || 'Instruções não disponíveis';
+
+            // Mostrar seção de informações
+            document.getElementById('game-info').style.display = 'block';
+            document.getElementById('game-info').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Iniciar jogo
+        function startGame() {
+            if (!currentGame) {
+                showMessage('Nenhum jogo carregado', 'error');
+                return;
+            }
+
+            try {
+                // Gerar dados do jogo baseado nos termos
+                const gameData = generateGameFromShared(currentGame);
+                
+                // Armazenar no localStorage
+                localStorage.setItem("currentGame", JSON.stringify(gameData));
+                localStorage.setItem("sharedGameInfo", JSON.stringify({
+                    shareCode: currentGame.shareCode,
+                    gameId: currentGame._id,
+                    createdBy: currentGame.createdBy.username
+                }));
+
+                // Atualizar estatísticas do usuário (incrementar jogos jogados)
+                try {
+                    await fetch("/api/user/update-game-stats", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            score: 0, // Score 0 para jogos jogados, a pontuação real será atualizada na página do jogo
+                            isGameCreation: false
+                        })
+                    });
+                } catch (error) {
+                    console.error("Erro ao atualizar estatísticas de jogos jogados:", error);
+                }
+                
+                // Redirecionar para a página do jogo
+                redirectToGame(currentGame.gameType);
+                
+            } catch (error) {
+                console.error('Erro ao iniciar jogo:', error);
+                showMessage('Erro ao iniciar jogo: ' + error.message, 'error');
+            }
+        }
+
+        // Gerar dados do jogo a partir do jogo compartilhado
+        function generateGameFromShared(sharedGame) {
+            const terms = sharedGame.terms;
+            
+            switch (sharedGame.gameType) {
+                case 'memory':
+                    return generateMemoryGame(terms);
+                case 'association':
+                    return generateAssociationGame(terms);
+                case 'quiz':
+                    return generateQuizGame(terms);
+                default:
+                    throw new Error(`Tipo de jogo não suportado: ${sharedGame.gameType}`);
+            }
+        }
+
+        // Gerar jogo da memória
+        function generateMemoryGame(terms) {
+            const cards = [];
+            terms.forEach((term, index) => {
+                cards.push({
+                    id: `term-${index}`,
+                    type: 'term',
+                    content: term.term,
+                    pairId: index
+                });
+                cards.push({
+                    id: `definition-${index}`,
+                    type: 'definition',
+                    content: term.definition,
+                    pairId: index
+                });
+            });
+
+            return {
+                gameType: 'memory',
+                cards: shuffleArray(cards),
+                totalPairs: terms.length,
+                instructions: 'Encontre os pares correspondentes entre termos e definições'
+            };
+        }
+
+        // Gerar jogo de associação
+        function generateAssociationGame(terms) {
+            const termsList = terms.map((term, index) => ({
+                id: index,
+                content: term.term
+            }));
+
+            const definitionsList = terms.map((term, index) => ({
+                id: index,
+                content: term.definition
+            }));
+
+            return {
+                gameType: 'association',
+                terms: termsList,
+                definitions: shuffleArray(definitionsList),
+                instructions: 'Arraste cada termo para sua definição correspondente'
+            };
+        }
+
+        // Gerar quiz
+        function generateQuizGame(terms) {
+            const questions = [];
+
+            terms.forEach((term, index) => {
+                const wrongAnswers = terms
+                    .filter((_, i) => i !== index)
+                    .map(t => t.definition)
+                    .slice(0, 3);
+
+                const allAnswers = shuffleArray([
+                    term.definition,
+                    ...wrongAnswers
+                ]);
+
+                const correctAnswerIndex = allAnswers.findIndex(answer => answer === term.definition);
+
+                questions.push({
+                    id: index,
+                    question: term.term,
+                    answers: allAnswers,
+                    correctAnswer: correctAnswerIndex,
+                    explanation: `A definição correta de "${term.term}" é: ${term.definition}`
+                });
+            });
+
+            return {
+                gameType: 'quiz',
+                questions: shuffleArray(questions),
+                totalQuestions: questions.length,
+                instructions: 'Selecione a definição correta para cada termo apresentado'
+            };
+        }
+
+        // Embaralhar array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Redirecionar para a página do jogo
+        function redirectToGame(gameType) {
+            switch (gameType) {
+                case 'memory':
+                    window.location.href = '/terms-and-definitions/memory/indexmemory.html';
+                    break;
+                case 'association':
+                    window.location.href = '/terms-and-definitions/association/index.html';
+                    break;
+                case 'quiz':
+                    window.location.href = '/terms-and-definitions/quiz/index.html';
+                    break;
+                default:
+                    showMessage('Tipo de jogo não reconhecido', 'error');
+            }
+        }
+
+        // Exibir mensagem
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            
+            if (type === 'loading') {
+                container.innerHTML = `<div class="loading">${message}</div>`;
+            } else {
+                container.innerHTML = `<div class="${type}">${message}</div>`;
+                
+                if (type !== 'loading') {
+                    setTimeout(() => {
+                        container.innerHTML = '';
+                    }, 5000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

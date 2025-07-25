@@ -1,0 +1,4 @@
+
+Microsoft DiskPart versao 6.1.7600
+Copyright (C) 1999-2008 Microsoft Corporation.
+No computador: MININT-L94JTID

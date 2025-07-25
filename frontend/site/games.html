@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos - ApproveIt Games</title>
+    <link rel="stylesheet" href="commons.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .game-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .game-card.selected {
+            border: 3px solid #667eea;
+            transform: translateY(-5px);
+        }
+
+        .game-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .game-card-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .game-card-body {
+            padding: 1.5rem;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .game-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .game-features li {
+            color: #555;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .game-features li:before {
+            content: "✓";
+            color: #00b894;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .game-options {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-options h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-large {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+        }
+
+        .share-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .share-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .share-code {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .share-link {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 1rem;
+            word-break: break-all;
+            margin-bottom: 1rem;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: #e6f7e6;
+            color: #00b894;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .game-types {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jogos Educativos</h1>
+            <p>Selecione o tipo de jogo e gere automaticamente a partir dos seus termos</p>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-links">
+                <a href="indexcomeco.html">Início</a>
+                <a href="terms.html">Termos</a>
+                <a href="games.html" class="active">Jogos</a>
+            </div>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+
+        <div id="message-container"></div>
+
+        <div class="game-types">
+            <div class="game-card" data-game-type="memory" onclick="selectGameType('memory')">
+                <div class="game-card-header">
+                    <h3>🧠 Jogo da Memória</h3>
+                </div>
+                <div class="game-card-body">
+                    <p class="game-description">
+                        Encontre os pares correspondentes entre termos e suas definições. 
+                        Teste sua memória e aprenda de forma divertida!
+                    </p>
+                    <ul class="game-features">
+                        <li>Cartas com termos e definições</li>
+                        <li>Sistema de pontuação por tempo</li>
+                        <li>Diferentes níveis de dificuldade</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="game-card" data-game-type="association" onclick="selectGameType('association')">
+                <div class="game-card-header">
+                    <h3>🔗 Jogo de Associação</h3>
+                </div>
+                <div class="game-card-body">
+                    <p class="game-description">
+                        Arraste cada termo para sua definição correspondente. 
+                        Desenvolva conexões lógicas de forma interativa!
+                    </p>
+                    <ul class="game-features">
+                        <li>Interface de arrastar e soltar</li>
+                        <li>Feedback visual imediato</li>
+                        <li>Pontuação por precisão</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="game-card" data-game-type="quiz" onclick="selectGameType('quiz')">
+                <div class="game-card-header">
+                    <h3>❓ Quiz</h3>
+                </div>
+                <div class="game-card-body">
+                    <p class="game-description">
+                        Responda perguntas de múltipla escolha sobre os termos cadastrados. 
+                        Teste seus conhecimentos de forma desafiadora!
+                    </p>
+                    <ul class="game-features">
+                        <li>Perguntas de múltipla escolha</li>
+                        <li>Alternativas embaralhadas</li>
+                        <li>Explicações detalhadas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="game-card" data-game-type="word-search" onclick="selectGameType('word-search')">
+                <div class="game-card-header">
+                    <h3>🔍 Caça-Palavras</h3>
+                </div>
+                <div class="game-card-body">
+                    <p class="game-description">
+                        Encontre os termos escondidos na grade de letras. 
+                        Desenvolva concentração e agilidade visual!
+                    </p>
+                    <ul class="game-features">
+                        <li>Grade de letras interativa</li>
+                        <li>Palavras em múltiplas direções</li>
+                        <li>Sistema de dicas e pontuação</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-options" id="game-options" style="display: none;">
+            <h2>Configurações do Jogo</h2>
+            
+            <div class="form-group">
+                <label for="category-select">Categoria dos Termos:</label>
+                <select id="category-select">
+                    <option value="">Carregando categorias...</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-large" onclick="generateGame()">
+                    🎮 Gerar e Jogar
+                </button>
+                <button class="btn btn-large" onclick="generateAndShare()" style="background: #00b894;">
+                    📤 Gerar e Compartilhar
+                </button>
+            </div>
+        </div>
+
+        <div class="share-section" id="share-section">
+            <h2>🎉 Jogo Criado com Sucesso!</h2>
+            <p>Seu jogo foi gerado e está pronto para ser compartilhado. Use o código abaixo:</p>
+            
+            <div class="share-code" id="share-code"></div>
+            
+            <p>Ou compartilhe este link direto:</p>
+            <div class="share-link" id="share-link"></div>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" onclick="copyShareCode()">📋 Copiar Código</button>
+                <button class="btn" onclick="copyShareLink()">🔗 Copiar Link</button>
+                <button class="btn" onclick="playSharedGame()" style="background: #00b894;">🎮 Jogar Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedGameType = null;
+        let currentShareCode = null;
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            checkUserTerms();
+        });
+
+        // Carregar categorias
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar categorias');
+                }
+
+                const categories = await response.json();
+                const categorySelect = document.getElementById('category-select');
+                
+                categorySelect.innerHTML = '<option value="">Todas as categorias</option>';
+                
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name.charAt(0).toUpperCase() + category.name.slice(1);
+                    if (!category.isDefault) {
+                        option.textContent += ' (personalizada)';
+                    }
+                    categorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('Erro ao carregar categorias', 'error');
+            }
+        }
+
+        // Verificar se o usuário tem termos cadastrados
+        async function checkUserTerms() {
+            try {
+                const response = await fetch('/api/terms');
+                if (!response.ok) {
+                    throw new Error('Erro ao verificar termos');
+                }
+
+                const terms = await response.json();
+                if (terms.length === 0) {
+                    showMessage('Você precisa cadastrar alguns termos antes de criar jogos. <a href="terms.html">Clique aqui para cadastrar</a>', 'error');
+                    document.querySelectorAll('.game-card').forEach(card => {
+                        card.style.opacity = '0.5';
+                        card.style.pointerEvents = 'none';
+                    });
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage('Erro ao verificar termos cadastrados', 'error');
+            }
+        }
+
+        // Selecionar tipo de jogo
+        function selectGameType(gameType) {
+            selectedGameType = gameType;
+            
+            // Remover seleção anterior
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adicionar seleção atual
+            document.querySelector(`[data-game-type="${gameType}"]`).classList.add('selected');
+            
+            // Mostrar opções
+            document.getElementById('game-options').style.display = 'block';
+            document.getElementById('game-options').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Gerar jogo para jogar
+        async function generateGame() {
+            if (!selectedGameType) {
+                showMessage('Selecione um tipo de jogo primeiro', 'error');
+                return;
+            }
+
+            const category = document.getElementById('category-select').value;
+            
+            try {
+                const response = await fetch('/api/games/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        gameType: selectedGameType,
+                        category: category || undefined
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erro ao gerar jogo');
+                }
+
+                const gameData = await response.json();
+                
+                // Armazenar dados do jogo no localStorage
+                localStorage.setItem('currentGame', JSON.stringify(gameData));
+                
+                // Atualizar estatísticas do usuário (incrementar jogos criados)
+                try {
+                    await fetch('/api/user/update-game-stats', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            score: 0 // Score 0 para criação de jogo, não para jogar
+                        })
+                    });
+                } catch (error) {
+                    console.error('Erro ao atualizar estatísticas:', error);
+                }
+                
+                // Redirecionar para a página do jogo
+                redirectToGame(selectedGameType);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // Gerar jogo e compartilhar
+        async function generateAndShare() {
+            if (!selectedGameType) {
+                showMessage('Selecione um tipo de jogo primeiro', 'error');
+                return;
+            }
+
+            const category = document.getElementById('category-select').value;
+            
+            try {
+                // Primeiro, gerar o jogo
+                const gameResponse = await fetch('/api/games/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        gameType: selectedGameType,
+                        category: category || undefined
+                    })
+                });
+
+                if (!gameResponse.ok) {
+                    const error = await gameResponse.json();
+                    throw new Error(error.error || 'Erro ao gerar jogo');
+                }
+
+                const gameData = await gameResponse.json();
+                
+                // Obter IDs dos termos usados
+                const termIds = gameData.cards ? 
+                    gameData.cards.map(card => card.pairId).filter((id, index, arr) => arr.indexOf(id) === index) :
+                    gameData.terms ? gameData.terms.map(term => term.id) :
+                    gameData.questions ? gameData.questions.map(q => q.id) : [];
+
+                // Criar jogo compartilhável
+                const shareResponse = await fetch('/api/games/share', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        gameType: selectedGameType,
+                        termIds: termIds
+                    })
+                });
+
+                if (!shareResponse.ok) {
+                    const error = await shareResponse.json();
+                    throw new Error(error.error || 'Erro ao criar jogo compartilhável');
+                }
+
+                const shareData = await shareResponse.json();
+                currentShareCode = shareData.shareCode;
+                
+                // Mostrar seção de compartilhamento
+                document.getElementById('share-code').textContent = shareData.shareCode;
+                document.getElementById('share-link').textContent = 
+                    `${window.location.origin}/play.html?code=${shareData.shareCode}`;
+                document.getElementById('share-section').style.display = 'block';
+                document.getElementById('share-section').scrollIntoView({ behavior: 'smooth' });
+                
+                showMessage('Jogo criado e pronto para compartilhar!', 'success');
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // Redirecionar para a página do jogo
+        function redirectToGame(gameType) {
+            switch (gameType) {
+                case 'memory':
+                    window.location.href = '/terms-and-definitions/memory/indexmemory.html';
+                    break;
+                case 'association':
+                    window.location.href = '/terms-and-definitions/association/index.html';
+                    break;
+                case 'quiz':
+                    window.location.href = '/terms-and-definitions/quiz/index.html';
+                    break;
+                case 'word-search':
+                    window.location.href = '/terms-and-definitions/word-search/index.html';
+                    break;
+                default:
+                    showMessage('Tipo de jogo não reconhecido', 'error');
+            }
+        }
+
+        // Copiar código de compartilhamento
+        function copyShareCode() {
+            const shareCode = document.getElementById('share-code').textContent;
+            navigator.clipboard.writeText(shareCode).then(() => {
+                showMessage('Código copiado para a área de transferência!', 'success');
+            }).catch(() => {
+                showMessage('Erro ao copiar código', 'error');
+            });
+        }
+
+        // Copiar link de compartilhamento
+        function copyShareLink() {
+            const shareLink = document.getElementById('share-link').textContent;
+            navigator.clipboard.writeText(shareLink).then(() => {
+                showMessage('Link copiado para a área de transferência!', 'success');
+            }).catch(() => {
+                showMessage('Erro ao copiar link', 'error');
+            });
+        }
+
+        // Jogar jogo compartilhado
+        function playSharedGame() {
+            if (currentShareCode) {
+                window.location.href = `/play.html?code=${currentShareCode}`;
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        // Exibir mensagem
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
